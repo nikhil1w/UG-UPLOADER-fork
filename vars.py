@@ -8,7 +8,7 @@ BOT_TOKEN = os.environ.get("BOT_TOKEN", "8298054627:AAH893YCXzyawHRGx1GBsuJczhN1
 
 CREDIT = os.environ.get("CREDIT", "〱〱⏤͟͞𝙃 𝙈🐦‍🔥 〄 ♥️ᡃ⃝🦋▕")
 # MongoDB Configuration
-DATABASE_NAME = os.environ.get("DATABASE_NAME", "UGxPRO")
+DATABASE_NAME = os.environ.get("DATABASE_NAME", "Cluster0")
 DATABASE_URL = os.environ.get("DATABASE_URL", "mongodb+srv://dimife7904:dimife7904@cluster0.a1lovrw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
 MONGO_URL = DATABASE_URL  # For auth system
 
