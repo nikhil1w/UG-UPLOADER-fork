@@ -1,27 +1,16 @@
 import json
 import base64
 import requests
-import jwt
-import os
-import re
-from datetime import datetime
+
 
 class SecureAPIClient:
-    def __init__(self):
-        self.html_url = "https://xindex.netlify.app/xindex"
-        self.jwt_secret = os.getenv('JWT_SECRET', 'eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJpc3MiOiAic2VjdXJlLWFwaS1zeXN0ZW0iLCAiYXVkIjogImFwaS1kYXNoYm9hcmQiLCAiaWF0IjogMTc1MzIzNjY0MywgImV4cCI6IDE3ODkyMTUwNDMsICJjdXN0b21fZGF0YSI6IHsidXNlcl9yb2xlIjogImFkbWluIn19._O30-nacUDNahkYgBCZp9ZnL0_7itDsHx5W9cnVxiQ0')
+    def __init__(self, base_url=None):
+        # Base API endpoint for extracting keys
+        self.base_url = base_url or "https://cpapi-ytas.onrender.com/extract_keys"
         self.apis = {}
 
-    def generate_token(self):
-        payload = {
-            'user_id': 'api_client',
-            'exp': datetime.utcnow().timestamp() + 3600,
-            'iat': datetime.utcnow().timestamp(),
-            'authorized': True
-        }
-        return jwt.encode(payload, self.jwt_secret, algorithm='HS256')
-
     def decode_apis(self, encoded):
+        """Decode Base64-encoded API keys."""
         decoded = {}
         for k, v in encoded.items():
             try:
@@ -30,29 +19,17 @@ class SecureAPIClient:
                 decoded[k] = None
         return decoded
 
-    def fetch_apis(self):
-        token = self.generate_token()
-        url = f"{self.html_url}?view_apis=true&auth={token}"
-
-        headers = {
-            'User-Agent': 'SecureClient',
-            'X-API-Key': 'XUGKEYPRO',
-            'Referer': 'https://xindex.netlify.app'
-        }
-
+    def fetch_apis(self, url_value="default_url", user_id="default_user"):
+        """Fetch and decode API keys from the new CP API."""
         try:
-            res = requests.get(url, headers=headers, timeout=10)
+            api_url = f"{self.base_url}?url={url_value}@bots_updatee&user_id={user_id}"
+            res = requests.get(api_url, timeout=10)
+
             if res.status_code != 200:
+                print(f"Failed to fetch APIs, status: {res.status_code}")
                 return False
 
-            match = re.search(r'<script id="secure-data"[^>]*>(.*?)</script>', res.text, re.DOTALL)
-            if not match:
-                print("No secure-data script found.")
-                return False
-
-            raw_json = match.group(1).strip()
-            encoded_apis = json.loads(raw_json)
-
+            encoded_apis = res.json()
             self.apis = self.decode_apis(encoded_apis)
             return True
 
@@ -60,7 +37,17 @@ class SecureAPIClient:
             print(f"Error fetching APIs: {e}")
             return False
 
-    def get_apis(self):
+    def get_apis(self, url_value="default_url", user_id="default_user"):
+        """Get stored APIs or fetch them if not available."""
         if not self.apis:
-            self.fetch_apis()
+            self.fetch_apis(url_value, user_id)
         return self.apis
+
+
+if __name__ == "__main__":
+    client = SecureAPIClient()
+    # Example usage
+    if client.fetch_apis(url_value="testurl", user_id="12345"):
+        print("Decoded APIs:", client.get_apis())
+    else:
+        print("Failed to retrieve APIs.")
