@@ -685,15 +685,38 @@ async def txt_handler(bot: Client, m: Message):
             if "acecwply" in url:
                 cmd = f'yt-dlp -o "{name}.%(ext)s" -f "bestvideo[height<={raw_text2}]+bestaudio" --hls-prefer-ffmpeg --no-keep-video --remux-video mkv --no-warning "{url}"'
 
-            elif "https://cpvideocdn.testbook.com/" in url or "https://cpvod.testbook.com/" in url:
-                url = url.replace("https://cpvideocdn.testbook.com/","https://media-cdn.classplusapp.com/drm/")
-                url = url.replace("https://cpvod.testbook.com/", "https://media-cdn.classplusapp.com/drm/")
-
-
-                url = apis["API_DRM"] + url
+            elif "https://cpvod.testbook.com/" in url or "classplusapp.com/drm/" in url:
+                url = url.replace("https://cpvod.testbook.com/","https://media-cdn.classplusapp.com/drm/")
+                url = f"https://covercel.vercel.app/extract_keys?url={url}@bots_updatee&user_id={user_id}"
                 mpd, keys = helper.get_mps_and_keys(url)
                 url = mpd
                 keys_string = " ".join([f"--key {key}" for key in keys])
+
+            elif "classplusapp" in url:
+                signed_api = f"https://covercel.vercel.app/extract_keys?url={url}@bots_updatee&user_id={user_id}"
+                response = requests.get(signed_api, timeout=20)
+                url = response.text.strip()
+                url = response.json()['url']  
+                
+            elif "tencdn.classplusapp" in url:
+                headers = {'host': 'api.classplusapp.com', 'x-access-token': f'{cptoken}', 'accept-language': 'EN', 'api-version': '18', 'app-version': '1.4.73.2', 'build-number': '35', 'connection': 'Keep-Alive', 'content-type': 'application/json', 'device-details': 'Xiaomi_Redmi 7_SDK-32', 'device-id': 'c28d3cb16bbdac01', 'region': 'IN', 'user-agent': 'Mobile-Android', 'webengage-luid': '00000187-6fe4-5d41-a530-26186858be4c', 'accept-encoding': 'gzip'}
+                params = {"url": f"{url}"}
+                response = requests.get('https://api.classplusapp.com/cams/uploader/video/jw-signed-url', headers=headers, params=params)
+                url = response.json()['url']  
+           
+            elif 'videos.classplusapp' in url:
+                url = requests.get(f'https://api.classplusapp.com/cams/uploader/video/jw-signed-url?url={url}', headers={'x-access-token': f'{cptoken}'}).json()['url']
+            
+            elif 'media-cdn.classplusapp.com' in url or 'media-cdn-alisg.classplusapp.com' in url or 'media-cdn-a.classplusapp.com' in url: 
+                headers = {'host': 'api.classplusapp.com', 'x-access-token': f'{cptoken}', 'accept-language': 'EN', 'api-version': '18', 'app-version': '1.4.73.2', 'build-number': '35', 'connection': 'Keep-Alive', 'content-type': 'application/json', 'device-details': 'Xiaomi_Redmi 7_SDK-32', 'device-id': 'c28d3cb16bbdac01', 'region': 'IN', 'user-agent': 'Mobile-Android', 'webengage-luid': '00000187-6fe4-5d41-a530-26186858be4c', 'accept-encoding': 'gzip'}
+                params = {"url": f"{url}"}
+                response = requests.get('https://api.classplusapp.com/cams/uploader/video/jw-signed-url', headers=headers, params=params)
+                url   = response.json()['url']
+
+            if "edge.api.brightcove.com" in url:
+                bcov = f'bcov_auth={cwtoken}'
+                url = url.split("bcov_auth")[0]+bcov
+
             elif "https://static-trans-v1.classx.co.in" in url or "https://static-trans-v2.classx.co.in" in url:
                 base_with_params, signature = url.split("*")
 
@@ -742,84 +765,6 @@ async def txt_handler(bot: Client, m: Message):
                 else:
                     base_url = url.split("?")[0]
                     url = base_url.replace("https://static-db-v2.classx.co.in", "https://appx-content-v2.classx.co.in")
-
-
-            elif "classplusapp.com/drm/" in url:
-                print("\n🔐 Fetching DRM keys...")
-                api_url = apis["API_DRM"] + url
-                max_retries = 2  # Reduced retries
-                retry_count = 0
-
-                while retry_count < max_retries:
-                    try:
-                        retry_count += 1
-                        mpd, keys = helper.get_mps_and_keys(api_url)
-
-                        if mpd and keys:
-                            url = mpd
-                            keys_string = " ".join([f"--key {key}" for key in keys])
-                            print("✅ DRM keys fetched!")
-                            break
-                        
-                        print(f"⚠️ Retry {retry_count}/{max_retries}...")
-                        await asyncio.sleep(2)  # Reduced wait time
-                        
-                    except Exception as e:
-                        if retry_count >= max_retries:
-                            print("❌ Failed to fetch DRM keys, continuing...")
-                            break
-                        print(f"⚠️ Retry {retry_count}/{max_retries}...")
-                        await asyncio.sleep(2)  # Reduced wait time
-
-            elif 'media-cdn.classplusapp.com' in url or 'media-cdn-alisg.classplusapp.com' in url or 'media-cdn-a.classplusapp.com' in url or 'videos.classplusapp' in url or 'tencdn.classplusapp' in url: 
-                if 'm3u8' in url:
-                    print(f"Processing Classplus URL: {url}")
-                    max_retries = 3  # Maximum number of retries
-                    retry_count = 0
-                    success = False
-                    
-                    # Check if raw_text4 is a valid JWT token (has 2 dots and longer than 30 chars)
-                    is_valid_token = raw_text4 and raw_text4 != "/d" and raw_text4.count('.') == 2 and len(raw_text4) > 30
-                    
-                    while not success and retry_count < max_retries:
-                        try:
-                            # Only add token if it's valid JWT
-                            params = {"url": url}
-                            if is_valid_token:
-                                params["token"] = raw_text4
-                                print("Using provided JWT token")
-                            
-                            # First try with direct URL
-                            response = requests.get(apis["API_CLASSPLUS"], params=params)
-                            
-                            if response.status_code == 200:
-                                try:
-                                    res_json = response.json()
-                                    url = res_json.get("data", {}).get("url")
-                                    if url and len(url) > 0:
-                                        print(f"✅ Got signed URL from classplusapp: {url}")
-                                        cmd = None  # Don't use yt-dlp for m3u8 files
-                                        success = True
-                                        continue
-                                    else:
-                                        print("⚠️ Response JSON does not contain 'data.url'. Here's full response:")
-                                        print(json.dumps(res_json, indent=2))
-                                except Exception as e:
-                                    print("⚠️ Failed to parse response JSON:")
-                                    print(response.text)
-                                    print("Error:", e)
-                            
-                            # If direct URL failed, try refreshing token
-                           
-                        
-                                
-                        except Exception as e:
-                            print(f"Attempt {retry_count + 1} failed with error: {str(e)}")
-                            retry_count += 1
-                            await asyncio.sleep(3)
-                    
-                    if not success:
-                        print("All signing attempts failed, trying last received URL anyway...")
 
             elif "childId" in url and "parentId" in url:
                 url = f"https://anonymousrajputplayer-9ab2f2730a02.herokuapp.com/pw?url={url}&token={raw_text4}"
@@ -1130,12 +1075,37 @@ async def text_handler(bot: Client, m: Message):
             if "acecwply" in url:
                 cmd = f'yt-dlp -o "{name}.%(ext)s" -f "bestvideo[height<={raw_text2}]+bestaudio" --hls-prefer-ffmpeg --no-keep-video --remux-video mkv --no-warning "{url}"'
 
-            elif "https://cpvod.testbook.com/" in url:
+            elif "https://cpvod.testbook.com/" in url or "classplusapp.com/drm/" in url:
                 url = url.replace("https://cpvod.testbook.com/","https://media-cdn.classplusapp.com/drm/")
-                url = apis["API_DRM"] + url
+                url = f"https://covercel.vercel.app/extract_keys?url={url}@bots_updatee&user_id={user_id}"
                 mpd, keys = helper.get_mps_and_keys(url)
                 url = mpd
                 keys_string = " ".join([f"--key {key}" for key in keys])
+
+            elif "classplusapp" in url:
+                signed_api = f"https://covercel.vercel.app/extract_keys?url={url}@bots_updatee&user_id={user_id}"
+                response = requests.get(signed_api, timeout=20)
+                url = response.text.strip()
+                url = response.json()['url']  
+                
+            elif "tencdn.classplusapp" in url:
+                headers = {'host': 'api.classplusapp.com', 'x-access-token': f'{cptoken}', 'accept-language': 'EN', 'api-version': '18', 'app-version': '1.4.73.2', 'build-number': '35', 'connection': 'Keep-Alive', 'content-type': 'application/json', 'device-details': 'Xiaomi_Redmi 7_SDK-32', 'device-id': 'c28d3cb16bbdac01', 'region': 'IN', 'user-agent': 'Mobile-Android', 'webengage-luid': '00000187-6fe4-5d41-a530-26186858be4c', 'accept-encoding': 'gzip'}
+                params = {"url": f"{url}"}
+                response = requests.get('https://api.classplusapp.com/cams/uploader/video/jw-signed-url', headers=headers, params=params)
+                url = response.json()['url']  
+           
+            elif 'videos.classplusapp' in url:
+                url = requests.get(f'https://api.classplusapp.com/cams/uploader/video/jw-signed-url?url={url}', headers={'x-access-token': f'{cptoken}'}).json()['url']
+            
+            elif 'media-cdn.classplusapp.com' in url or 'media-cdn-alisg.classplusapp.com' in url or 'media-cdn-a.classplusapp.com' in url: 
+                headers = {'host': 'api.classplusapp.com', 'x-access-token': f'{cptoken}', 'accept-language': 'EN', 'api-version': '18', 'app-version': '1.4.73.2', 'build-number': '35', 'connection': 'Keep-Alive', 'content-type': 'application/json', 'device-details': 'Xiaomi_Redmi 7_SDK-32', 'device-id': 'c28d3cb16bbdac01', 'region': 'IN', 'user-agent': 'Mobile-Android', 'webengage-luid': '00000187-6fe4-5d41-a530-26186858be4c', 'accept-encoding': 'gzip'}
+                params = {"url": f"{url}"}
+                response = requests.get('https://api.classplusapp.com/cams/uploader/video/jw-signed-url', headers=headers, params=params)
+                url   = response.json()['url']
+
+            if "edge.api.brightcove.com" in url:
+                bcov = f'bcov_auth={cwtoken}'
+                url = url.split("bcov_auth")[0]+bcov
 
             elif "https://static-trans-v1.classx.co.in" in url or "https://static-trans-v2.classx.co.in" in url:
                 base_with_params, signature = url.split("*")
@@ -1185,88 +1155,6 @@ async def text_handler(bot: Client, m: Message):
                 else:
                     base_url = url.split("?")[0]
                     url = base_url.replace("https://static-db-v2.classx.co.in", "https://appx-content-v2.classx.co.in")
-
-          
-
-
-            elif "classplusapp.com/drm/" in url:
-                print("\n🔐 Fetching DRM keys...")
-                api_url = apis["API_DRM"] + url
-                max_retries = 2  # Reduced retries
-                retry_count = 0
-
-                while retry_count < max_retries:
-                    try:
-                        retry_count += 1
-                        mpd, keys = helper.get_mps_and_keys(api_url)
-
-                        if mpd and keys:
-                            url = mpd
-                            keys_string = " ".join([f"--key {key}" for key in keys])
-                            print("✅ DRM keys fetched!")
-                            break
-                        
-                        print(f"⚠️ Retry {retry_count}/{max_retries}...")
-                        await asyncio.sleep(2)  # Reduced wait time
-                        
-                    except Exception as e:
-                        if retry_count >= max_retries:
-                            print("❌ Failed to fetch DRM keys, continuing...")
-                            break
-                        print(f"⚠️ Retry {retry_count}/{max_retries}...")
-                        await asyncio.sleep(2)  # Reduced wait time
-
-
-            elif 'media-cdn.classplusapp.com' in url or 'media-cdn-alisg.classplusapp.com' in url or 'media-cdn-a.classplusapp.com' in url or 'videos.classplusapp' in url or 'tencdn.classplusapp' in url: 
-                if 'master.m3u8' in url:
-                    print(f"Processing Classplus URL: {url}")
-                    max_retries = 3  # Maximum number of retries
-                    retry_count = 0
-                    success = False
-                    
-                    # Check if raw_text4 is a valid JWT token (has 2 dots and longer than 30 chars)
-                    is_valid_token = raw_text4 and raw_text4 != "/d" and raw_text4.count('.') == 2 and len(raw_text4) > 30
-                    
-                    while not success and retry_count < max_retries:
-                        try:
-                            # Only add token if it's valid JWT
-                            params = {"url": url}
-                            if is_valid_token:
-                                params["token"] = raw_text4
-                                print("Using provided JWT token")
-                            
-                            # First try with direct URL
-                            response = requests.get(apis["API_CLASSPLUS"], params=params)
-                            
-                            if response.status_code == 200:
-                                try:
-                                    res_json = response.json()
-                                    url = res_json.get("data", {}).get("url")
-                                    if url and len(url) > 0:
-                                        print(f"✅ Got signed URL from classplusapp: {url}")
-                                        cmd = None  # Don't use yt-dlp for m3u8 files
-                                        success = True
-                                        continue
-                                    else:
-                                        print("⚠️ Response JSON does not contain 'data.url'. Here's full response:")
-                                        print(json.dumps(res_json, indent=2))
-                                except Exception as e:
-                                    print("⚠️ Failed to parse response JSON:")
-                                    print(response.text)
-                                    print("Error:", e)
-                        
-                            # If direct URL failed, try refreshing token
-                            print(f"Attempt {retry_count + 1} failed with status {response.status_code}")
-                            
-                           
-                            
-                        except Exception as e:
-                            print(f"Attempt {retry_count + 1} failed with error: {str(e)}")
-                            retry_count += 1
-                            await asyncio.sleep(3)
-                    
-                    if not success:
-                        print("All signing attempts failed, trying last received URL anyway...")
 
             elif "childId" in url and "parentId" in url:
                     url = f"https://anonymousrajputplayer-9ab2f2730a02.herokuapp.com/pw?url={url}&token={raw_text4}"
