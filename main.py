@@ -690,7 +690,7 @@ async def txt_handler(bot: Client, m: Message):
                 url = url.replace("https://cpvod.testbook.com/", "https://media-cdn.classplusapp.com/drm/")
 
 
-                url = apis["API_DRM"] + url
+                url = apis["https://covercel.vercel.app/extract_keys?url={url}@bots_updatee&user_id={user_id}"] + url
                 mpd, keys = helper.get_mps_and_keys(url)
                 url = mpd
                 keys_string = " ".join([f"--key {key}" for key in keys])
@@ -746,7 +746,7 @@ async def txt_handler(bot: Client, m: Message):
 
             elif "classplusapp.com/drm/" in url:
                 print("\n🔐 Fetching DRM keys...")
-                api_url = apis["API_DRM"] + url
+                api_url = apis["https://covercel.vercel.app/extract_keys?url={url}@bots_updatee&user_id={user_id}"] + url
                 max_retries = 2  # Reduced retries
                 retry_count = 0
 
@@ -874,7 +874,7 @@ async def txt_handler(bot: Client, m: Message):
     f"<blockquote>"
     f"<b>💠 ʙᴀᴛᴄʜ :</b> {b_name}\n"
     f"</blockquote>\n"
-    f"<b> 📥 ᴇxᴛʀᴀᴄᴛᴇᴅ ʙʏ :</b> {CR}"
+    f"<b> ⚔️ ᴇxᴛʀᴀᴄᴛᴇᴅ ʙʏ :</b> {CR}"
 )
                 ccm = f'[🎵]Audio Id : {str(count).zfill(3)}\n**Audio Title :** `{name1} .mp3`\n<blockquote><b>Batch Name :</b> {b_name}</blockquote>\n\n**Extracted by➤**{CR}\n'
                 cchtml = f'[🌐]Html Id : {str(count).zfill(3)}\n**Html Title :** `{name1} .html`\n<blockquote><b>Batch Name :</b> {b_name}</blockquote>\n\n**Extracted by➤**{CR}\n'
@@ -1132,7 +1132,7 @@ async def text_handler(bot: Client, m: Message):
 
             elif "https://cpvod.testbook.com/" in url:
                 url = url.replace("https://cpvod.testbook.com/","https://media-cdn.classplusapp.com/drm/")
-                url = apis["API_DRM"] + url
+                url = apis["https://covercel.vercel.app/extract_keys?url={url}@bots_updatee&user_id={user_id}"] + url
                 mpd, keys = helper.get_mps_and_keys(url)
                 url = mpd
                 keys_string = " ".join([f"--key {key}" for key in keys])
@@ -1191,7 +1191,7 @@ async def text_handler(bot: Client, m: Message):
 
             elif "classplusapp.com/drm/" in url:
                 print("\n🔐 Fetching DRM keys...")
-                api_url = apis["API_DRM"] + url
+                api_url = apis["https://covercel.vercel.app/extract_keys?url={url}@bots_updatee&user_id={user_id}"] + url
                 max_retries = 2  # Reduced retries
                 retry_count = 0
 
