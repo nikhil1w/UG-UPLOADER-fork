@@ -74,7 +74,7 @@ client = SecureAPIClient()
 apis = client.get_apis()
 
 # Global variables
-watermark = "UG"  # Default value
+watermark = "SURAJ"  # Default value
 count = 0
 userbot = None
 timeout_duration = 300  # 5 minutes
