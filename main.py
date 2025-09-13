@@ -74,7 +74,7 @@ client = SecureAPIClient()
 apis = client.get_apis()
 
 # Global variables
-watermark = "SURAJ"  # Default value
+watermark = "NIKHIL"  # Default value
 count = 0
 userbot = None
 timeout_duration = 300  # 5 minutes
@@ -186,11 +186,11 @@ photozip = 'https://envs.sh/cD_.jpg'
 
 
 # Inline keyboard for start command
-BUTTONSCONTACT = InlineKeyboardMarkup([[InlineKeyboardButton(text="📞 Contact", url="https://t.me/ItsUGxBot")]])
+BUTTONSCONTACT = InlineKeyboardMarkup([[InlineKeyboardButton(text="📞 Contact", url="https://t.me/STUDENTZZZBOT")]])
 keyboard = InlineKeyboardMarkup(
     [
         [
-            InlineKeyboardButton(text="🛠️ Help", url="https://t.me/ItsUGBot")        ],
+            InlineKeyboardButton(text="🛠️ Help", url="https://t.me/STUDENTZZZBOT")        ],
     ]
 )
 
@@ -687,13 +687,13 @@ async def txt_handler(bot: Client, m: Message):
 
             elif "https://cpvod.testbook.com/" in url or "classplusapp.com/drm/" in url:
                 url = url.replace("https://cpvod.testbook.com/","https://media-cdn.classplusapp.com/drm/")
-                url = f"https://covercel.vercel.app/extract_keys?url={url}@bots_updatee&user_id={7445620075}"
+                url = f"https://proexfreetoken.vercel.app/api/hacker"
                 mpd, keys = helper.get_mps_and_keys(url)
                 url = mpd
                 keys_string = " ".join([f"--key {key}" for key in keys])
 
             elif "classplusapp" in url:
-                signed_api = f"https://covercel.vercel.app/extract_keys?url={url}@bots_updatee&user_id={7445620075}"
+                signed_api = f"https://proexfreetoken.vercel.app/api/hacker"
                 response = requests.get(signed_api, timeout=20)
                 url = response.text.strip()
                 url = response.json()['url']  
@@ -1077,13 +1077,13 @@ async def text_handler(bot: Client, m: Message):
 
             elif "https://cpvod.testbook.com/" in url or "classplusapp.com/drm/" in url:
                 url = url.replace("https://cpvod.testbook.com/","https://media-cdn.classplusapp.com/drm/")
-                url = f"https://covercel.vercel.app/extract_keys?url={url}@bots_updatee&user_id={7445620075}"
+                url = f"https://proexfreetoken.vercel.app/api/hacker"
                 mpd, keys = helper.get_mps_and_keys(url)
                 url = mpd
                 keys_string = " ".join([f"--key {key}" for key in keys])
 
             elif "classplusapp" in url:
-                signed_api = f"https://covercel.vercel.app/extract_keys?url={url}@bots_updatee&user_id={7445620075}"
+                signed_api = f"https://proexfreetoken.vercel.app/api/hacker"
                 response = requests.get(signed_api, timeout=20)
                 url = response.text.strip()
                 url = response.json()['url']  
