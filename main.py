@@ -687,14 +687,14 @@ async def txt_handler(bot: Client, m: Message):
 
             elif "https://cpvod.testbook.com/" in url or "classplusapp.com/drm/" in url:
                 url = url.replace("https://cpvod.testbook.com/","https://media-cdn.classplusapp.com/drm/")
-                url = f"https://covercel.vercel.app/extract_keys?url={url}@bots_updatee&user_id={7445620075}"
+                url = f"https://marco-cp-api.vercel.app/marco?url={url}@ITSMARCOOFFICIAL&user_id={user_id}"
                 mpd, keys = helper.get_mps_and_keys(url)
                 url = mpd
                 keys_string = " ".join([f"--key {key}" for key in keys])
 
             elif "classplusapp" in url:
-                signed_api = f"https://covercel.vercel.app/extract_keys?url={url}@bots_updatee&user_id={7445620075}"
-                response = requests.get(signed_api, timeout=20)
+                signed_api = f"https://marco-cp-api.vercel.app/marco?url={url}@ITSMARCOOFFICIAL&user_id={user_id}"
+                response = requests.get(signed_api, timeout=200)
                 url = response.text.strip()
                 url = response.json()['url']  
                 
@@ -1077,14 +1077,14 @@ async def text_handler(bot: Client, m: Message):
 
             elif "https://cpvod.testbook.com/" in url or "classplusapp.com/drm/" in url:
                 url = url.replace("https://cpvod.testbook.com/","https://media-cdn.classplusapp.com/drm/")
-                url = f"https://covercel.vercel.app/extract_keys?url={url}@bots_updatee&user_id={7445620075}"
+                url = f"https://marco-cp-api.vercel.app/marco?url={url}@ITSMARCOOFFICIAL&user_id={user_id}"
                 mpd, keys = helper.get_mps_and_keys(url)
                 url = mpd
                 keys_string = " ".join([f"--key {key}" for key in keys])
 
             elif "classplusapp" in url:
-                signed_api = f"https://covercel.vercel.app/extract_keys?url={url}@bots_updatee&user_id={7445620075}"
-                response = requests.get(signed_api, timeout=20)
+                signed_api = f"https://marco-cp-api.vercel.app/marco?url={url}@ITSMARCOOFFICIAL&user_id={user_id}"
+                response = requests.get(signed_api, timeout=200)
                 url = response.text.strip()
                 url = response.json()['url']  
                 
